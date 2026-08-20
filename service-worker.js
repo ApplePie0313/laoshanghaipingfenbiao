@@ -1,5 +1,5 @@
 // 老上海评分表 - Service Worker（简单离线缓存）
-const CACHE_NAME = 'laoshanghai-score-v1';
+const CACHE_NAME = 'laoshanghai-score-v2';
 const PRECACHE_URLS = [
   './',
   './index.html',
