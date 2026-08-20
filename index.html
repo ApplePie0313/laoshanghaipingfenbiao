@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>老上海评分表</title>
+  <meta name="description" content="记录吃喝玩乐的专属评分本">
+  <meta name="theme-color" content="#8B3A2E">
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <!-- 图标：浏览器标签 / 桌面书签 -->
+  <link rel="icon" type="image/svg+xml" href="./icon-192.svg">
+  <link rel="apple-touch-icon" href="./icon-192.svg">
+
+  <!-- iOS 专属：全屏 + 状态栏颜色 + 桌面名称 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="评分表">
+
+  <!-- 安卓/Win 专属：防止点击电话号码高亮 -->
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- ==================== 视图一：大分类首页 ==================== -->
+    <section id="view-home" class="view">
+      <header class="home-header">
+        <h1 class="site-title">老 上 海 评 分 表</h1>
+        <p class="site-subtitle">记录每一口滋味，每一次心动</p>
+
+        <!-- 搜索框 -->
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="搜索店名、产品、备注…（例如：红烧肉）">
+          <button class="search-clear hidden" id="searchClear" title="清除">×</button>
+        </div>
+      </header>
+
+      <!-- 搜索结果区（有搜索词时显示，无搜索词时隐藏） -->
+      <div id="searchResults" class="search-results hidden"></div>
+
+      <div id="categoryGridWrap">
+        <div class="category-grid" id="categoryGrid">
+          <!-- 三大分类卡片：JS 渲染 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 视图二：店名列表 ==================== -->
+    <section id="view-shops" class="view hidden">
+      <header class="page-header">
+        <button class="btn-back" id="btnBackHome">← 返回</button>
+        <h2 class="page-title" id="shopsCategoryTitle">🍜 吃</h2>
+        <span></span>
+      </header>
+      <div class="page-actions">
+        <button class="btn-primary" id="btnAddShop">+ 新建店名</button>
+      </div>
+      <div class="shop-list" id="shopList">
+        <!-- 店名卡片列表：JS 渲染 -->
+      </div>
+    </section>
+
+    <!-- ==================== 视图三：产品列表 ==================== -->
+    <section id="view-products" class="view hidden">
+      <header class="page-header">
+        <button class="btn-back" id="btnBackShops">← 返回</button>
+        <div class="breadcrumb">
+          <span class="crumb-cat" id="crumbCategory">🍜 吃</span>
+          <span class="crumb-sep"> / </span>
+          <span class="crumb-shop" id="crumbShop">老吉士酒家</span>
+        </div>
+        <span></span>
+      </header>
+
+      <div class="shop-info" id="shopInfo">
+        <!-- 店名信息区：JS 渲染 -->
+      </div>
+
+      <div class="page-actions">
+        <button class="btn-primary" id="btnAddProduct">+ 新建产品</button>
+      </div>
+
+      <div class="product-section-title">
+        <span>产品列表</span>
+        <span class="sort-hint">按评分从高到低</span>
+      </div>
+      <div class="product-list" id="productList">
+        <!-- 产品卡片列表：JS 渲染 -->
+      </div>
+    </section>
+
+    <!-- ==================== 弹窗：新建 / 编辑 店名 ==================== -->
+    <div class="modal-mask hidden" id="shopModalMask">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="shopModalTitle">新建店名</h3>
+          <button class="modal-close" data-close="shopModalMask">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label required">店名</label>
+            <input type="text" class="form-input" id="shopNameInput" placeholder="例如：老吉士酒家">
+          </div>
+          <div class="form-group">
+            <label class="form-label">地址</label>
+            <input type="text" class="form-input" id="shopAddressInput" placeholder="例如：徐汇区天平路41号（选填）">
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea class="form-textarea" id="shopNotesInput" rows="3" placeholder="对这家店的整体印象、推荐指数等（选填）"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-default" data-close="shopModalMask">取消</button>
+          <button class="btn-primary" id="btnSaveShop">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 弹窗：新建 / 编辑 产品 ==================== -->
+    <div class="modal-mask hidden" id="productModalMask">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="productModalTitle">新建产品</h3>
+          <button class="modal-close" data-close="productModalMask">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label required">产品名</label>
+            <input type="text" class="form-input" id="productNameInput" placeholder="例如：红烧肉">
+          </div>
+          <div class="form-group">
+            <label class="form-label required">评分</label>
+            <div class="star-rating" id="starRating">
+              <!-- 5 颗星 + 半星支持：JS 渲染交互 -->
+            </div>
+            <div class="rating-text">当前评分：<span id="ratingValue">0.0</span> 分</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea class="form-textarea" id="productNotesInput" rows="3" placeholder="口感、是否推荐、注意事项等（选填）"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-default" data-close="productModalMask">取消</button>
+          <button class="btn-primary" id="btnSaveProduct">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 弹窗：删除产品确认 ==================== -->
+    <div class="modal-mask hidden" id="deleteModalMask">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h3>确认删除</h3>
+          <button class="modal-close" data-close="deleteModalMask">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="delete-warning">
+            <span class="delete-icon">⚠️</span>
+            <p>确定要删除「<span id="deleteProductName">红烧肉</span>」吗？</p>
+            <p class="delete-hint">删除后无法恢复。</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-default" data-close="deleteModalMask">取消</button>
+          <button class="btn-danger" id="btnConfirmDelete">确认删除</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // 注册 Service Worker（必须是 HTTPS 或 localhost 下才生效）
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('./service-worker.js', { scope: './' })
+          .catch((err) => console.warn('SW 注册失败：', err));
+      });
+    }
+  </script>
+</body>
+</html>

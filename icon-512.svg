@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#FAF5EC"/>
+  <text x="256" y="320" text-anchor="middle" font-family="'Noto Serif SC','Songti SC','SimSun',serif" font-size="168" font-weight="700" fill="#8B3A2E" letter-spacing="14">食物志</text>
+  <rect x="106" y="80" width="300" height="10" rx="5" fill="#D4A03C" opacity="0.9"/>
+  <rect x="106" y="422" width="300" height="10" rx="5" fill="#D4A03C" opacity="0.9"/>
+</svg>
