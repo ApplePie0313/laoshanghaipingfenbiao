@@ -179,11 +179,15 @@
 
   <script src="app.js"></script>
   <script>
-    // 注册 Service Worker（必须是 HTTPS 或 localhost 下才生效）
+    // 注册 Service Worker（必须 HTTPS / localhost 下生效）
+    // 动态计算 scope：自动兼容 GitHub Pages 子路径（如 /laoshanghaipingfenbiao/）
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
+        // scope = 当前 index.html 所在目录的绝对路径（总是正确匹配）
+        const swScope = new URL('./', location.href).pathname;
         navigator.serviceWorker
-          .register('./service-worker.js', { scope: './' })
+          .register('./service-worker.js', { scope: swScope })
+          .then((reg) => console.log('SW 已注册，scope:', reg.scope))
           .catch((err) => console.warn('SW 注册失败：', err));
       });
     }
